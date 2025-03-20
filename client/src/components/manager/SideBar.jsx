@@ -12,6 +12,7 @@ import { Toast } from 'primereact/toast';
 import { InputText } from "primereact/inputtext";
 import { Dialog } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
+import logo from "../../pictures/logo.jpg"
 
 export default function SideBar(props) {
   const id = props.id || {}
@@ -43,7 +44,7 @@ export default function SideBar(props) {
       if (res.status === 200) {
         const dataProject = res.data.map(project => { return project.projectId })
         setProjects(dataProject)
-        navigate(0,{ state: {id,num:1} })
+        navigate(0, { state: { id, num: 1 } })
       }
     } catch (err) {
       console.error(err)
@@ -51,7 +52,7 @@ export default function SideBar(props) {
   }
 
   const getProjects = async () => {
-    
+
     try {
       const res = await axios.get(`http://localhost:3005/api/project/getProjects/${id}`,
         { headers: { Authorization: `Bearer ${token}` } })
@@ -105,7 +106,7 @@ export default function SideBar(props) {
           headers: { Authorization: `Bearer ${token}` }
         })
       if (res.status === 200) {
-        const dataClients = res.data.map(client => { return {...client.clientId,project:client.projectId.name,projectId:client.projectId._id}})
+        const dataClients = res.data.map(client => { return { ...client.clientId, project: client.projectId.name, projectId: client.projectId._id } })
         setContacts(dataClients)
         // num===1?navigate(0,{state:{id,num:1}}):navigate(`../manager/${id}`,{ state: {id,num:1 }})
       }
@@ -133,8 +134,8 @@ export default function SideBar(props) {
       label: "Users",
       icon: "pi pi-users",
       items: [
-        { label: "All Clients", icon: "pi pi-list", command: () => {num===1?  navigate(0,{ state: {id,num:1} }):navigate(`/manager/${id}`,{ state: {id,num:1 }})}},
-        { label: "Add Client", icon: "pi pi-user-plus", command: () => {num===2 ? navigate(0,{ state: {id,num:2} }): navigate(`/manager/${id}/AddClient`,{ state: {id,num:2 }})}}
+        { label: "All Clients", icon: "pi pi-list", command: () => { num === 1 ? navigate(0, { state: { id, num: 1 } }) : navigate(`/manager/${id}`, { state: { id, num: 1 } }) } },
+        { label: "Add Client", icon: "pi pi-user-plus", command: () => { num === 2 ? navigate(0, { state: { id, num: 2 } }) : navigate(`/manager/${id}/AddClient`, { state: { id, num: 2 } }) } }
       ]
     },
     {
@@ -170,8 +171,9 @@ export default function SideBar(props) {
       ]
     },
     { label: "Analytics", icon: "pi pi-chart-bar", command: () => console.log("Analytics Clicked") },
-    { label: "Settings", icon: "pi pi-cog", command: ()=>{num===4? navigate(0,{ state: {id,num:4}}): navigate(`/manager/${id}/settings`,{state: {id,num :4 }})}},
-    { label: "Help", icon: "pi pi-question", command: () => console.log("Help Clicked") }
+    { label: "Settings", icon: "pi pi-cog", command: () => { navigate(`/manager/${id}/settings`, { state: { id, num: 4 } }) } },
+    // { label: "Settings", icon: "pi pi-cog", command: ()=>{num===4? navigate(0,{ state: {id,num:4}}): navigate(`/manager/${id}/settings`,{state: {id,num :4 }})}},
+    { label: "Help", icon: "pi pi-question", command: () => console.log("Help Clicked") },
   ];
 
   return (
@@ -182,6 +184,12 @@ export default function SideBar(props) {
           <div className="sidebar">
             <h2>Menu</h2>
             <Menu model={items} className="w-full" />
+            {/* 5555555555555555*/}
+            {/* <div className="side-bar-title">
+              <img src={logo} alt="logo" className="card-icon" />
+              <h1>Task Track</h1>
+            </div> */}
+            {/*5555555555555555 */}
           </div>
         )}
 

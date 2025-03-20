@@ -60,16 +60,16 @@ const addManager = async (req, res) => {
         return res.status(400).send("manager not created")
     }
 
-    let projectExist=await Project.findOne({name:projectName}).lean()
+    let projectExist = await Project.findOne({ name: projectName }).lean()
     if (!projectExist) {
-        projectExist = await Project.create({ name:projectName });
+        projectExist = await Project.create({ name: projectName });
         if (!projectExist) {
             return res.status(400).send("project not created")
         }
 
     }
-    const projectToManager = await ProjectToManager.create({ projectId: projectExist._id, managerId:manager._id });
-    
+    const projectToManager = await ProjectToManager.create({ projectId: projectExist._id, managerId: manager._id });
+
     if (!projectToManager) {
         return res.status(400).send("project not created")
     }
@@ -79,22 +79,32 @@ const addManager = async (req, res) => {
 
 const getManagerClient = async (req, res) => {
     const { id } = req.params
-    const user = await User.findById(id).lean()
-    if (!user) {
-        return res.status(400).send("user not found")
+    if(!id){
+        return re.status(400).send("id is required")
     }
-
-    const clients = await Connection.find({ managerId: user._id.toString() }).populate("clientId").populate("projectId").lean()
+    const clients = await Connection.find({ managerId: id }).populate("clientId").populate("projectId").lean()
     if (!clients)
         return res.status(400).send("clients not found")
     const uniqueArray = [...new Set(clients)];
     res.json(uniqueArray)
 }
 
-const getManager=async(req,res)=>{
+const getClientManagers = async (req,res)=>{
     const { id } = req.params
-    const user=await User.findById(id).lean()
-    if(!user){ 
+    if(!id){
+        return re.status(400).send("id is required")
+    }
+    const managers = await Connection.find({ clientId: id }).populate("managerId").lean()
+    if (!managers)
+        return res.status(400).send("managers not found")
+    const uniqueArray = [...new Set(managers)];
+    res.json(uniqueArray)
+}
+
+const getUser = async (req, res) => {
+    const { id } = req.params
+    const user = await User.findById(id).lean()
+    if (!user) {
         return res.status(400).send("user not found")
     }
     res.json(user)
@@ -130,8 +140,8 @@ const getClient = async (req, res) => {
 const getProjectClients = async (req, res) => {
 
     const { projectId, managerId } = req.params
-    
-    
+
+
     if (!managerId || !projectId) {
         return res.status(400).send("managerId and projectId are required")
     }
@@ -144,10 +154,10 @@ const getProjectClients = async (req, res) => {
 }
 
 const updateUser = async (req, res) => {
-    const { id, name, password, address, phone, email } = req.body
+    const { id, name, address, phone, email } = req.body
 
-    if (!id || !name || !password || !phone || !email) {
-        return res.status(400).send("id and name and password and phone and email are required")
+    if (!id || !name || !phone || !email) {
+        return res.status(400).send("id and name and phone and email are required")
     }
     const user = await User.findById(id).exec();
     if (!user) {
@@ -157,7 +167,29 @@ const updateUser = async (req, res) => {
     user.phone = phone
     user.address = address
     user.email = email
-    const newPass = await bcrypt.hash(password, 10)
+
+    const newUser = await user.save()
+    if (!newUser) {
+        return res.status(400).send("user not updated")
+    }
+    res.json(newUser)
+}
+
+const changePassword = async (req, res) => {
+    const { id, password, newPassword } = req.body
+
+    if (!id || !password) {
+        return res.status(400).send("id  and password and newPassword are required")
+    }
+    const user = await User.findById(id).exec();
+    if (!user) {
+        return res.status(400).send("user not found")
+    }
+    const match = await bcrypt.compare(password, user.password)
+    if (!match)
+        return res.status(400).send("password not correct")
+
+    const newPass = await bcrypt.hash(newPassword, 10)
     user.password = newPass
 
     const newUser = await user.save()
@@ -168,7 +200,7 @@ const updateUser = async (req, res) => {
 }
 
 const deleteClient = async (req, res) => {
-    
+
     const { id, managerId, projectId } = req.body
 
     if (!id || !managerId || !projectId) {
@@ -213,12 +245,12 @@ const deleteClient = async (req, res) => {
     return res.json(uniqueArray)
 }
 
-const addImage=async(req,res)=>{
-    const { id,imageUrl } = req.body
+const addImage = async (req, res) => {
+    const { id, imageUrl } = req.body
     if (!imageUrl || !id) {
         return res.status(400).send("imageUrl and id are required")
     }
-    
+
     const user = await User.findById(id).exec();
     if (!user) {
         return res.status(400).send("user not found")
@@ -240,7 +272,9 @@ module.exports = {
     getClient,
     getProjectClients,
     updateUser,
-    getManager,
+    getUser,
     deleteClient,
-    addImage
+    addImage,
+    changePassword,
+    getClientManagers
 }

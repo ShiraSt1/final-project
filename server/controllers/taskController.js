@@ -35,17 +35,41 @@ const getTask = async (req, res) => {
 }
 
 
-const getTasksManager = async (req, res) => {
+// const getTasksManager = async (req, res) => {
 
-    const { connectionId } = req.body
-    if (!connectionId ) {
-        return res.status(400).send("connectionId is required")
+//     const { connectionId } = req.body
+//     if (!connectionId ) {
+//         return res.status(400).send("connectionId is required")
+//     }
+
+//     const tasks = await Task.find({ connectionId }).lean();
+//     if (!tasks)
+//         return res.status(400).send("tasks not found")
+//     res.json(tasks)
+// }
+
+const getTasks=async(req,res)=>{
+    try{
+        const { clientId } = req.params
+        
+        if ( !clientId) {
+            return res.status(400).send("clientId is required")
+        }
+
+        const connections=await Connection.find({clientId}).lean()
+        if(!connections){
+            return res.status(400).send("connections not found")
+        }
+        
+        const allTasks= await Promise.all(connections.map(async(connection)=>{
+            return await Task.find({ connectionId:connection._id }).populate('connectionId').lean();
+        })) 
+        res.json(allTasks)
+        
+    }catch(err){
+        console.error(err);
+        res.status(500).send("Server error");
     }
-
-    const tasks = await Task.find({ connectionId }).lean();
-    if (!tasks)
-        return res.status(400).send("tasks not found")
-    res.json(tasks)
 }
 
 const getTasksClient = async (req, res) => {
@@ -142,9 +166,10 @@ const deleteTask = async (req, res) => {
 module.exports = {
     addTask,
     getTask,
-    getTasksManager,
+    // getTasksManager,
     getTasksClient,
     updateTask,
     deleteTask,
-    completeTask
+    completeTask,
+    getTasks
 }

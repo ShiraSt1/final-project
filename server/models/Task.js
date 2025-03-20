@@ -9,7 +9,7 @@ const taskSchema = new mongoose.Schema({
     },
     completed:{
         type:Boolean,
-        Default:false
+        default:false
     },
     connectionId:{
         type:mongoose.Schema.Types.ObjectId,

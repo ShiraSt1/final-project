@@ -9,11 +9,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 export default function Header(props) {
   const navigate=useNavigate()
   const location = useLocation();
-  const [manager, setManager] = useState({});
   const id = props.id || {}
+  const manager = props.manager || {}
+  const setManager = props.setManager || {}
   const num = props.num || {}
-  const contacts = props.contacts || {}
+  const contacts = props.contacts || []
+  console.log(contacts);  
   const setContacts = props.setContacts || {}
+  const [copyContacts,setCopyContacts]=useState([])    
   const token = JSON.parse(localStorage.getItem('token')) || ""
   // const [image, setImage] = useState(null);
 
@@ -41,29 +44,18 @@ export default function Header(props) {
       reader.readAsDataURL(file);
     }
   };
-  ////////////////////////////////////////////צריך לעשות העתק של המערך של האנשי קשר
-  const searchName=(valName)=>{    
-    setContacts(contacts.filter(contact=>{
+  const searchName=(valName)=>{       
+    setContacts(copyContacts.filter(contact=>{
         return contact.name.includes(valName)
     }))
   }
 
-  const getManager = async () => {
-    try {
-        const res = await axios.get(`http://localhost:3005/api/user/getManager/${id}`,
-            { headers: { Authorization: `Bearer ${token}` } })
-        if (res.status === 200) {
-            setManager(res.data)
-        }
-    }
-    catch (err) {
-        console.error(err)
-    }
-}
-
+  
 useEffect(() => {
-  getManager()
-}, [])
+  if (copyContacts.length === 0 ) {
+    setCopyContacts([...contacts]); 
+  }
+}, [contacts]);
 
 return (
   <div
@@ -88,18 +80,21 @@ return (
     <h2></h2>
     <h2></h2>
     <div className="p-inputgroup" style={{ width: "45%" }} id="search">
-      <span className="p-inputgroup-addon">
+      {num===1?<>
+        <span className="p-inputgroup-addon">
         <i className="pi pi-search" />
       </span>
-      <InputText type="text" className="p-inputtext-lg" placeholder="Search..." onChange={(e)=>{searchName(e.target.value)}}/>
+      <InputText type="text" className="p-inputtext-lg" placeholder="Search..." onChange={(e)=>{searchName(e.target.value)}}/></>:null
+      }
+      
     </div>
 
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
       <span>{manager.name}</span>
       <Button icon="pi pi-bell" className="p-button-rounded p-button-text p-button-secondary" />
       <Button icon="pi pi-envelope" className="p-button-rounded p-button-text p-button-secondary" />
-      <Button icon="pi pi-user" className="p-button-rounded p-button-text p-button-secondary" />
-      <Button icon="pi pi-cog" className="p-button-rounded p-button-text p-button-secondary" onClick={()=>{num===4? navigate(0,{ state: {id,num:4}}): navigate(`/manager/${id}/settings`,{state: {id,num :4 }}) }}/>
+      <Button icon="pi pi-user" className="p-button-rounded p-button-text p-button-secondary" onClick={()=>{num===1?  navigate(0,{ state: {id,num:1} }):navigate(`/manager/${id}`,{ state: {id,num:1 }})}}/>
+      <Button icon="pi pi-cog" className="p-button-rounded p-button-text p-button-secondary" onClick={()=>{navigate(`/manager/${id}/settings`,{state: {id,num :4 }}) }}/>
       {/* <Avatar label='A' size="large" shape="circle" /> */}
       <div>
           <Avatar
@@ -107,7 +102,6 @@ return (
             size="large"
             shape="circle"
             onClick={handleAvatarClick}
-            // style={{ cursor: "pointer" }}
             style={{ 
               cursor: "pointer", 
               backgroundImage: `url(${manager.imageUrl})`, 

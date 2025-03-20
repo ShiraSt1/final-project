@@ -3,6 +3,7 @@ import Login from './components/Login';
 import SignUp from './components/SignUp';
 import {Routes, Route } from 'react-router-dom';
 import Site from './components/manager/Site';
+import SiteClient from './components/client/SiteClient';
 function App() {
   return (
     <>
@@ -22,6 +23,9 @@ function App() {
         <Route path="/manager/:id/EditClient" element={<Site />} />
         <Route path="/manager/:id/Details/:id" element={<Site />} />
         <Route path="/manager/:id/settings" element={<Site />} />
+
+        <Route path="/client/:id" element={<SiteClient />} />
+
       </Routes>
       {/* </Router> */}
 

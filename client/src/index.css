@@ -202,3 +202,71 @@ th {
   min-height: 100px; /* גובה מינימלי לתאים */
   vertical-align: top; /* יישור אנכי לחלק העליון */
 }
+
+
+/*5555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555*/
+
+
+/*sighn in-submit*/
+.custom-button {
+  background-color: #4CAF50; /* ירוק חי */
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.custom-button:active {
+  background-color: #3e8e41;
+  transform: scale(0.95);
+}
+/*sighn in-submit*/
+
+/*sighn in-logo*/
+.custom-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  justify-content: center; 
+  text-align: center; 
+}
+
+.card-title {
+  display: flex;
+  align-items: center; 
+  gap: 10px; 
+}
+
+.card-icon {
+  width: 60px; 
+  height: auto;
+  margin-left: 5%;
+}
+/*sighn in-logo*/
+
+
+/*side-bar-title*/
+
+.side-bar-title {
+  /* display: flex; */
+  /* align-items: center;  */
+  gap: 10px; 
+}
+.card-icon {
+  width: 100px; 
+  height: auto;
+  margin-left: 5%;
+}
+
+/*side-bar-title*/
+
+.custom-icon-button .pi {
+  font-size: 1.8rem; /* ניתן להגדיל כרצונך */
+}

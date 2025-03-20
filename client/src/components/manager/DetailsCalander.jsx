@@ -1,23 +1,56 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
+import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
+import { Menu } from 'primereact/menu';
 import { InputTextarea } from 'primereact/inputtextarea'
 import axios from "axios"
 import { FileUpload } from 'primereact/fileupload'
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
+import io from 'socket.io-client';
+import { ScrollPanel } from 'primereact/scrollpanel';
+import { Message } from 'primereact/message';
 
 const DetailsCalander = (props) => {
     const id = props.id || {}
+    const manager = props.manager || {}
+    const setManager = props.setManager || {}
     const rowData = props.rowData || {}
     const [date, setDate] = useState(new Date());
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
     const [tasks, setTasks] = useState([]);
     const token = JSON.parse(localStorage.getItem('token')) || ""
+    const toast = useRef(null);
+    const menuLeft = useRef(null);
+    const [selectedTask, setSelectedTask] = useState(null);
+    const [visible, setVisible] = useState(false);
+    const items = [
+        {
+            items: [
+                {
+                    label: 'Delete',
+                    icon: 'pi pi-trash',
+                    command: () => deleteTask(selectedTask._id)
+                },
+                {
+                    label: 'Edit',
+                    icon: 'pi pi-pencil',
+                    command: () => { setShowEdit(true); }
+                },
+                {
+                    label: 'Details',
+                    icon: 'pi pi-eye',
+                    command: () => console.log("Details")
+                },
+            ]
+        }
+    ];
+
     const [task, setTask] = useState({
         title: "",
         description: "",
@@ -28,7 +61,68 @@ const DetailsCalander = (props) => {
         date: null,
         _id: null
     });
+    /*555555555555555555555555555555555555555555555*/
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState('');
+    const messagesEndRef = useRef(null)
+
+    const socket = io('http://localhost:3005');
+
+    useEffect(() => {
+        const socket = io('http://localhost:3005');
+
+        // קבלת הודעות ישנות כאשר המטופל מתחבר
+        socket.on('previousMessages', (msgs) => {
+            setMessages(msgs.filter((msg) => { return (msg.senderId === id && msg.receiverId === rowData._id) || (msg.senderId === rowData._id && msg.receiverId === id) }));
+        });
+
+        // קבלת הודעה חדשה מהקלינאית
+        socket.on('newMessage', (message) => {
+            if ((message.senderId === id && message.receiverId === rowData._id) || (message.senderId === rowData._id && message.receiverId === id)) {
+                setMessages((prevMessages) => [...prevMessages, message]);
+            }
+        });
+
+        socket.on('connect_error', (err) => {
+            console.error('Socket connection error:', err);
+        });
+
+        socket.on('connect_timeout', (timeout) => {
+            console.error('Socket connection timeout:', timeout);
+        });
+
+        socket.on('error', (err) => {
+            console.error('Socket error:', err);
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+
+    }, [visible]);
+
+    const sendMessage = () => {
+        if (newMessage.trim() !== '') {
+            const message = {
+                sender: manager.name || "",
+                senderId: id,
+                receiverId: rowData._id,
+                content: newMessage,
+                timestamp: new Date().toLocaleTimeString(),
+            };
+            socket.emit('sendMessage', message)
+            setNewMessage('');
+        }
+    };
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
+    /*55555555555555555555555555555555555 */
     const getTasks = async () => {
+
         try {
             const res = await axios.get(`http://localhost:3005/api/task/getTasksClient/${id}/${rowData.projectId}/${rowData._id}`,
                 { headers: { Authorization: `Bearer ${token}` } })
@@ -45,6 +139,7 @@ const DetailsCalander = (props) => {
     useEffect(() => {
         getTasks()
     }, [])
+
     const getWeekRange = (date) => {
         const startDate = new Date(date);
         startDate.setDate(date.getDate() - date.getDay());
@@ -59,7 +154,6 @@ const DetailsCalander = (props) => {
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
-
 
     const myFormat = (date) => {
         const day = date.getDate();
@@ -108,18 +202,18 @@ const DetailsCalander = (props) => {
             const res = await axios.delete(`http://localhost:3005/api/task/deleteTask/${taskId}`,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                const dataTasks = res.data.map((task) => { return task })
-                setTasks(dataTasks)
+                const tasksData = res.data.map((task) => { return task })
+                setTasks(tasksData)
             }
-        } catch (err) {
-            console.error(err)
+        }
+        catch (error) {
+            console.error(error)
         }
     }
 
     const editTask = async () => {
-
         try {
-            const res = await axios.put(`http://localhost:3005/api/task/updateTask`, { ...task, id: task._id },
+            const res = await axios.put(`http://localhost:3005/api/task/updateTask`, { ...selectedTask, id: selectedTask._id },
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
                 const dataTasks = res.data.map((task) => { return task })
@@ -132,9 +226,12 @@ const DetailsCalander = (props) => {
     }
 
     return (
+
         <>
-            <div style={{ display: "flex", justifyContent: "flex-start", paddingLeft: "60px", alignItems: "center", marginTop: "60px" }}>
-                <h1>{rowData.name}</h1>
+            <Toast ref={toast}></Toast>
+            <Menu model={items} popup ref={menuLeft} id="popup_menu_left" />
+            <div style={{ display: "flex", justifyContent: "flex-start", paddingLeft: "60px", alignItems: "center", marginTop: "40px" }}>
+                <h1 >Client:  {rowData.name}</h1>
             </div>
             <div className="calendar-container" style={{ marginTop: "0px" }}>
                 <Card className="weekly-calendar">
@@ -166,9 +263,12 @@ const DetailsCalander = (props) => {
                             <tr>
                                 {daysOfWeek.map((day) => {
                                     const filteredTasks = tasks.filter((ta) => {
+                                        // console.log("aaa" + dateFormat(new Date(ta.date)))
                                         return dateFormat(new Date(ta.date)) === dateFormat(day)
+
                                     })
                                     return (
+
                                         <td key={day.getTime()} className="day-cell">
                                             {filteredTasks.map((t) => (
                                                 <div
@@ -184,19 +284,25 @@ const DetailsCalander = (props) => {
                                                 >
                                                     <span style={{ marginRight: "10px", flex: "1" }}>{t.title}</span>
                                                     <div>
+
+
+                                                        {
+                                                            t.completed === false ?
+                                                                <i
+                                                                    className="pi pi-stop"
+                                                                    style={{ marginLeft: "5px", cursor: "pointer" }}
+                                                                /> :
+                                                                <i
+                                                                    className="pi pi-check-square"
+                                                                    style={{ marginLeft: "5px", cursor: "pointer" }}
+                                                                />
+                                                        }
                                                         <i
-                                                            className="pi pi-trash"
+                                                            className="pi pi-ellipsis-v"
                                                             style={{ marginRight: "5px", cursor: "pointer" }}
-                                                            onClick={() => deleteTask(t._id)}
+                                                            onClick={(event) => { console.log(t); menuLeft.current.toggle(event); setSelectedTask({ ...t }); }}
                                                         />
-                                                        <i
-                                                            className="pi pi-pencil"
-                                                            style={{ cursor: "pointer" }}
-                                                            onClick={() => {
-                                                                setShowEdit(true);
-                                                                setTask(t);
-                                                            }}
-                                                        />
+
                                                     </div>
                                                 </div>
                                             ))}
@@ -210,7 +316,7 @@ const DetailsCalander = (props) => {
                                     <td key={day.getTime()} className="day-cell">
                                         <Button label="Add Task" onClick={() => {
                                             setShowAdd(true);
-                                            setTask({ ...task, date: myFormat(day) })
+                                            ; setTask({ ...task, date: myFormat(day) })
                                         }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
                                     </td>
                                 ))}
@@ -219,7 +325,6 @@ const DetailsCalander = (props) => {
                     </table>
                 </Card>
             </div>
-
             <Dialog
                 visible={showAdd}
                 modal
@@ -230,7 +335,7 @@ const DetailsCalander = (props) => {
                             <InputText onChange={(e) => setTask({ ...task, title: e.target.value })} className="input-focus" placeholder="Task Name" label="TaskName" type="text" required></InputText>
                         </div>
                         <div className="inline-flex flex-column gap-2">
-                            <InputTextarea onChange={(e) => setTask({ ...task, description: e.target.value })} rows={5} cols={10} placeholder='Description' className="input-focus" />
+                            <InputTextarea onChange={(e) => setTask({ ...task, description: e.target.value })} rows={5} cols={30} placeholder='Description' className="input-focus" />
                             {/* <InputText onChange={(e) => setTask({ ...task, description: e.target.value })} className="input-focus" placeholder="Description" label="Description" type="text"></InputText> */}
                         </div>
                         <div className="inline-flex flex-column gap-2">
@@ -247,7 +352,6 @@ const DetailsCalander = (props) => {
                 )}
             ></Dialog>
 
-
             <Dialog
                 visible={showEdit}
                 modal
@@ -255,14 +359,14 @@ const DetailsCalander = (props) => {
                 content={({ hide }) => (
                     <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
                         <div className="inline-flex flex-column gap-2">
-                            <InputText value={task.title} onChange={(e) => setTask({ ...task, title: e.target.value })} className="input-focus" placeholder="Task Name" label="TaskName" type="text" required></InputText>
+                            <InputText value={selectedTask.title} onChange={(e) => setSelectedTask({ ...selectedTask, title: e.target.value })} className="input-focus" placeholder="Task Name" label="TaskName" type="text" required></InputText>
                         </div>
                         <div className="inline-flex flex-column gap-2">
-                            <InputTextarea value={task.description} onChange={(e) => setTask({ ...task, description: e.target.value })} rows={5} cols={10} placeholder='Description' className="input-focus" />
+                            <InputTextarea value={selectedTask.description} onChange={(e) => setSelectedTask({ ...selectedTask, description: e.target.value })} rows={5} cols={30} placeholder='Description' className="input-focus" />
                             {/* <InputText onChange={(e) => setTask({ ...task, description: e.target.value })} className="input-focus" placeholder="Description" label="Description" type="text"></InputText> */}
                         </div>
                         <div className="inline-flex flex-column gap-2">
-                            <InputText value={task.amount} onChange={(e) => setTask({ ...task, amount: e.target.value })} className="input-focus" placeholder="Amount" label="Amount" type="text" required></InputText>
+                            <InputText value={selectedTask.amount} onChange={(e) => setSelectedTask({ ...selectedTask, amount: e.target.value })} className="input-focus" placeholder="Amount" label="Amount" type="text" required></InputText>
                         </div>
                         <div className="card flex justify-content-center">
                             {/* <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload uploadHandler={customBase64Uploader} /> */}
@@ -274,8 +378,64 @@ const DetailsCalander = (props) => {
                     </div>
                 )}
             ></Dialog>
+
+            {/* <Button icon="pi pi-comment" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { setVisible(true) }} style={{ zIndex: 9999,border:"1px" }} /> */}
+            <Button
+                icon="pi pi-comment"
+                className="p-button-rounded p-button-text p-button-secondary custom-icon-button"
+                onClick={() => { setVisible(true) }}
+                style={{
+                    zIndex: 9999,
+                    position: 'fixed',
+                    bottom: '20px',
+                    right: '20px',
+                    width: '60px',
+                    height: '60px',
+                    border: '2px solid rgb(13, 124, 26)',
+                    backgroundColor: '#f0f0f0',
+                    color: 'rgb(13, 124, 26)',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            />
+
+            <Dialog
+                header={`Chat With ${rowData.name}`}
+                visible={visible}
+                position="bottom-right"
+                style={{ width: '350px', height: '60vh', bottom: '60px' }}
+                onHide={() => setVisible(false)}
+                draggable={false}
+                resizable={false}
+            >
+                <ScrollPanel style={{ flex: '1', overflowY: 'auto', marginBottom: '10px' }}>
+                    {messages.map((msg, index) => (
+                        <div key={index} style={{ marginBottom: '10px' }}>
+                            {`${msg.timestamp}`}
+                            <div style={{
+                                padding: "5%",
+                                backgroundColor: msg.sender === manager.name ? '#dcdcdc' : '#f5f5f5', 
+                                borderRadius: "5px"
+                            }}>
+                                {`${msg.sender}: ${msg.content} `}
+                            </div>
+                        </div>
+                    ))}
+                    <div ref={messagesEndRef} />
+                </ScrollPanel>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <InputText
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        placeholder="Type your Message..."
+                        style={{ flex: '1', marginRight: '10px' }}
+                    />
+                    <Button label="Send" onClick={sendMessage} />
+                </div>
+            </Dialog>
         </>
     );
 };
-
 export default DetailsCalander;

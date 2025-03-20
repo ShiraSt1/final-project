@@ -9,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 
 export default function Body(props) {
     const navigate=useNavigate()
-    // const [contacts, setContacts] = useState([]);
     const contacts=props.contacts || {}
     const setContacts=props.setContacts || {}
     const id = props.id || {}
