@@ -13,10 +13,12 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import io from 'socket.io-client';
 import { ScrollPanel } from 'primereact/scrollpanel';
-import { Message } from 'primereact/message';
+import DetailsTask from './DetailsTask';
+import { useSelector } from 'react-redux';
 
 const DetailsCalander = (props) => {
-    const id = props.id || {}
+    // const id = props.id || {}
+    const id=useSelector(x=>x.Id.id)
     const manager = props.manager || {}
     const setManager = props.setManager || {}
     const rowData = props.rowData || {}
@@ -29,6 +31,7 @@ const DetailsCalander = (props) => {
     const menuLeft = useRef(null);
     const [selectedTask, setSelectedTask] = useState(null);
     const [visible, setVisible] = useState(false);
+    const [showDetails, setShowDetails] = useState(false)
     const items = [
         {
             items: [
@@ -45,23 +48,18 @@ const DetailsCalander = (props) => {
                 {
                     label: 'Details',
                     icon: 'pi pi-eye',
-                    command: () => console.log("Details")
+                    command: () => { setShowDetails(true) }
                 },
             ]
         }
     ];
 
     const [task, setTask] = useState({
-        title: "",
-        description: "",
         managerId: id,
         projectId: rowData.projectId,
         clientId: rowData._id,
-        amount: "",
-        date: null,
-        _id: null
     });
-    /*555555555555555555555555555555555555555555555*/
+    /*start chat*/
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef(null)
@@ -120,7 +118,7 @@ const DetailsCalander = (props) => {
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
-    /*55555555555555555555555555555555555 */
+    /*end chat  */
     const getTasks = async () => {
 
         try {
@@ -184,12 +182,31 @@ const DetailsCalander = (props) => {
     }
 
     const addTask = async () => {
+        const formData = new FormData();
+        formData.append("title", task.title);
+        formData.append("date", task.date);
+        formData.append("managerId", task.managerId);
+        formData.append("clientId", task.clientId);
+        formData.append("projectId", task.projectId);
+        formData.append("file", task.file);
+        if (task.description) {
+            formData.append("description",task.description)
+        }
         try {
-            const res = await axios.post(`http://localhost:3005/api/task/addTask`, task,
+            const res = await axios.post(`http://localhost:3005/api/task/addTask`, formData,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                const dataTasks = res.data.map((task) => { return task })
-                setTasks(dataTasks)
+                setTasks(res.data)
+                setTask({
+                    title: "",
+                    description: "",
+                    managerId: id,
+                    projectId: rowData.projectId,
+                    clientId: rowData._id,
+                    date: null,
+                    _id: null,
+                    file: null
+                })
             }
         }
         catch (err) {
@@ -202,8 +219,7 @@ const DetailsCalander = (props) => {
             const res = await axios.delete(`http://localhost:3005/api/task/deleteTask/${taskId}`,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                const tasksData = res.data.map((task) => { return task })
-                setTasks(tasksData)
+                setTasks(res.data)
             }
         }
         catch (error) {
@@ -212,12 +228,18 @@ const DetailsCalander = (props) => {
     }
 
     const editTask = async () => {
+        const formData = new FormData();
+        formData.append("title", selectedTask.title);
+        formData.append("file", selectedTask.file);
+        formData.append("id", selectedTask._id);
+        if (selectedTask.description) {
+            formData.append("description",selectedTask.description)
+        }
         try {
-            const res = await axios.put(`http://localhost:3005/api/task/updateTask`, { ...selectedTask, id: selectedTask._id },
+            const res = await axios.put(`http://localhost:3005/api/task/updateTask`, formData,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                const dataTasks = res.data.map((task) => { return task })
-                setTasks(dataTasks)
+                setTasks(res.data)
             }
         }
         catch (err) {
@@ -231,7 +253,7 @@ const DetailsCalander = (props) => {
             <Toast ref={toast}></Toast>
             <Menu model={items} popup ref={menuLeft} id="popup_menu_left" />
             <div style={{ display: "flex", justifyContent: "flex-start", paddingLeft: "60px", alignItems: "center", marginTop: "40px" }}>
-                <h1 >Client:  {rowData.name}</h1>
+                <h1 >Client:  {rowData.name ? rowData.name.split(' ').map(name => name.charAt(0).toUpperCase() + name.slice(1)).join(' ') : ""}</h1>
             </div>
             <div className="calendar-container" style={{ marginTop: "0px" }}>
                 <Card className="weekly-calendar">
@@ -246,7 +268,7 @@ const DetailsCalander = (props) => {
                             <i className="pi pi-chevron-right"></i>
                         </button>
                     </div>
-                    <table> {/* שימוש בטבלה */}
+                    <table>
                         <thead>
                             <tr>
                                 {daysOfWeek.map((day) => (
@@ -259,11 +281,9 @@ const DetailsCalander = (props) => {
                         </thead>
                         <tbody>
 
-                            {/* כאן תוכל להוסיף שורות נוספות לתוכן של כל יום */}
                             <tr>
                                 {daysOfWeek.map((day) => {
                                     const filteredTasks = tasks.filter((ta) => {
-                                        // console.log("aaa" + dateFormat(new Date(ta.date)))
                                         return dateFormat(new Date(ta.date)) === dateFormat(day)
 
                                     })
@@ -300,7 +320,7 @@ const DetailsCalander = (props) => {
                                                         <i
                                                             className="pi pi-ellipsis-v"
                                                             style={{ marginRight: "5px", cursor: "pointer" }}
-                                                            onClick={(event) => { console.log(t); menuLeft.current.toggle(event); setSelectedTask({ ...t }); }}
+                                                            onClick={(event) => { setShowDetails(false); menuLeft.current.toggle(event); setSelectedTask({ ...t }); }}
                                                         />
 
                                                     </div>
@@ -325,6 +345,9 @@ const DetailsCalander = (props) => {
                     </table>
                 </Card>
             </div>
+
+
+
             <Dialog
                 visible={showAdd}
                 modal
@@ -336,13 +359,18 @@ const DetailsCalander = (props) => {
                         </div>
                         <div className="inline-flex flex-column gap-2">
                             <InputTextarea onChange={(e) => setTask({ ...task, description: e.target.value })} rows={5} cols={30} placeholder='Description' className="input-focus" />
-                            {/* <InputText onChange={(e) => setTask({ ...task, description: e.target.value })} className="input-focus" placeholder="Description" label="Description" type="text"></InputText> */}
                         </div>
-                        <div className="inline-flex flex-column gap-2">
-                            <InputText onChange={(e) => setTask({ ...task, amount: e.target.value })} className="input-focus" placeholder="Amount" label="Amount" type="text" required></InputText>
-                        </div>
-                        <div className="card flex justify-content-center">
-                            {/* <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload uploadHandler={customBase64Uploader} /> */}
+                        <div className="justify-content-center inline-flex flex-column gap-2" >
+                            <FileUpload mode="basic" chooseLabel="Upload Files" name="demo[]" url="/api/upload" maxFileSize={1000000}
+                                chooseOptions={{ style: { width: '100%', color: "green", background: "white", border: '1px solid green' } }}
+                                onSelect={(e) => {
+                                    const newFile = e.files[0];
+
+                                    setTask({
+                                        ...task, file: newFile
+                                    })
+                                    console.log("un select", task.file);
+                                }} />
                         </div>
                         <div className="flex align-items-center gap-2">
                             <Button label="Add" onClick={(e) => { hide(e); addTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
@@ -363,13 +391,48 @@ const DetailsCalander = (props) => {
                         </div>
                         <div className="inline-flex flex-column gap-2">
                             <InputTextarea value={selectedTask.description} onChange={(e) => setSelectedTask({ ...selectedTask, description: e.target.value })} rows={5} cols={30} placeholder='Description' className="input-focus" />
-                            {/* <InputText onChange={(e) => setTask({ ...task, description: e.target.value })} className="input-focus" placeholder="Description" label="Description" type="text"></InputText> */}
                         </div>
-                        <div className="inline-flex flex-column gap-2">
-                            <InputText value={selectedTask.amount} onChange={(e) => setSelectedTask({ ...selectedTask, amount: e.target.value })} className="input-focus" placeholder="Amount" label="Amount" type="text" required></InputText>
-                        </div>
-                        <div className="card flex justify-content-center">
-                            {/* <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload uploadHandler={customBase64Uploader} /> */}
+                        <div className="justify-content-center inline-flex flex-column gap-2" >
+                            {selectedTask.file && (
+                                <div className="flex items-center gap-2 mt-3 p-2 border rounded-md bg-gray-50">
+                                    <i className="pi pi-file" style={{ fontSize: '1.5rem' }}></i>
+                                    <div className="flex flex-col">
+                                        <span className="font-medium">{selectedTask.file.fileName}</span>
+                                    </div>
+                                    <Button
+                                        icon="pi pi-external-link"
+                                        text
+                                        onClick={() => window.open(`http://localhost:3005/${selectedTask.file.filePath}`, "_blank")}
+                                    />
+                                    <Button
+                                        icon="pi pi-trash"
+                                        text
+                                        severity="danger"
+                                        onClick={() => setSelectedTask({ ...selectedTask, file: null })}
+                                    />
+                                </div>
+                            )}
+                            <FileUpload
+                                mode="basic"
+                                chooseLabel="upload new file"
+                                name="demo[]"
+                                url="/api/upload"
+                                maxFileSize={1000000}
+                                chooseOptions={{
+                                    style: {
+                                        width: '100%',
+                                        color: "green",
+                                        background: "white",
+                                        border: '1px solid green'
+                                    }
+                                }}
+                                onSelect={(e) => {
+                                    const newFile = e.files[0];
+                                    setSelectedTask({
+                                        ...selectedTask, file: newFile
+                                    });
+                                }}
+                            />
                         </div>
                         <div className="flex align-items-center gap-2">
                             <Button label="Update" onClick={(e) => { hide(e); editTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
@@ -379,7 +442,6 @@ const DetailsCalander = (props) => {
                 )}
             ></Dialog>
 
-            {/* <Button icon="pi pi-comment" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { setVisible(true) }} style={{ zIndex: 9999,border:"1px" }} /> */}
             <Button
                 icon="pi pi-comment"
                 className="p-button-rounded p-button-text p-button-secondary custom-icon-button"
@@ -416,7 +478,7 @@ const DetailsCalander = (props) => {
                             {`${msg.timestamp}`}
                             <div style={{
                                 padding: "5%",
-                                backgroundColor: msg.sender === manager.name ? '#dcdcdc' : '#f5f5f5', 
+                                backgroundColor: msg.sender === manager.name ? '#dcdcdc' : '#f5f5f5',
                                 borderRadius: "5px"
                             }}>
                                 {`${msg.sender}: ${msg.content} `}
@@ -435,6 +497,9 @@ const DetailsCalander = (props) => {
                     <Button label="Send" onClick={sendMessage} />
                 </div>
             </Dialog>
+            <div className="card">
+                {showDetails && <DetailsTask selectedTask={selectedTask} setShowDetails={setShowDetails} />}
+            </div>
         </>
     );
 };

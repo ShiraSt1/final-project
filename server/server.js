@@ -5,7 +5,7 @@ const corsOptions = require("./config/corsOptions");
 const connectDB = require("./config/dbConn");
 connectDB();
 const app = express();
-
+const path = require("path");
 /* socket */
 const http = require('http');
 const socketIo = require('socket.io');
@@ -33,6 +33,7 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 // אפשרות לשמירת קבצים גדולים יותר
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(cors(corsOptions));
 app.use(express.json());

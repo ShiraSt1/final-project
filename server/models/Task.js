@@ -1,37 +1,36 @@
 const mongoose = require("mongoose")
 const taskSchema = new mongoose.Schema({
-    title:{
-    type:String,
-    required:true
+    title: {
+        type: String,
+        required: true
     },
-    description:{
-    type:String
+    description: {
+        type: String
     },
-    completed:{
-        type:Boolean,
-        default:false
+    completed: {
+        type: Boolean,
+        default: false
     },
-    connectionId:{
+    connectionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Connection",
+        required: true
+    },
+    date: {
+        type: Date,
+        required: true
+    },
+    difficulty: {
+        type: String
+    },
+    comment: {
+        type: String
+    },
+    file:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"Connection",
-        required:true
-    },
-    amount:{
-        type:String,
-        required:true
-    },
-    date:{
-        type:Date,
-        required:true
-    },
-    difficulty:{
-        type:String,
-        enum:["בינוני","קל","קשה"]
-    },
-    comment:{
-        type:String
+        ref:"File"
     }
-    },{
-    timestamps:true
-    })
-    module.exports = mongoose.model('Task', taskSchema)
+}, {
+    timestamps: true
+})
+module.exports = mongoose.model('Task', taskSchema)

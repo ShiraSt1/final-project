@@ -6,11 +6,13 @@ import { Avatar } from "primereact/avatar";
 import { Dropdown } from "primereact/dropdown";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function AddForm(props) {
     const navigate=useNavigate()
     const token = JSON.parse(localStorage.getItem('token')) || ""
-    const id = props.id || {}
+    // const id = props.id || {}
+    const id=useSelector(x=>x.Id.id)
     const [selectedProject, setSelectedProject] = useState(null);
     const [projects, setProjects] = useState([]);
     const [contact, setContact] = useState({
@@ -44,7 +46,7 @@ export default function AddForm(props) {
         try{
             const res=await axios.post(`http://localhost:3005/api/user/addClient`,client, { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                navigate(`../manager/${id}`, { state:{id,num:1} })
+                navigate(`../manager/${id}`, { state:{num:1} })
             }
         }catch(err){
             console.error(err)
@@ -65,12 +67,15 @@ export default function AddForm(props) {
                     <span className="p-inputgroup-addon">
                         <i className="pi pi-user" />
                     </span>
+            {/*ruth----- add className="input-focus" to all inputtext --------------------*/}
+
                     <InputText
                         name="name"
                         placeholder="full name"
                         value={contact.name}
                         onChange={handleChange}
                         required
+                        className="input-focus"
                     />
                 </div>
 
@@ -84,6 +89,7 @@ export default function AddForm(props) {
                         value={contact.userId}
                         onChange={handleChange}
                         required
+                        className="input-focus"
                     />
                 </div>
 
@@ -97,6 +103,7 @@ export default function AddForm(props) {
                         value={contact.phone}
                         onChange={handleChange}
                         required
+                        className="input-focus"
                     />
                 </div>
 
@@ -109,6 +116,7 @@ export default function AddForm(props) {
                         placeholder="address"
                         value={contact.address}
                         onChange={handleChange}
+                        className="input-focus"
                     />
                 </div>
 
@@ -122,6 +130,7 @@ export default function AddForm(props) {
                         value={contact.email}
                         onChange={handleChange}
                         required
+                        className="input-focus"
                     />
                 </div>
 
@@ -137,7 +146,7 @@ export default function AddForm(props) {
                         placeholder="project"
                         style={{ textAlign: 'left' }}
                         required
-                        className="w-full md:w-14rem" />
+                        className="w-full md:w-14rem input-focus" />
                 </div>
 
                 <Button type="submit" label="save" className="p-button-outlined save-btn" />

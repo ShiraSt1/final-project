@@ -3,7 +3,6 @@ import { InputText } from 'primereact/inputtext';
 import { Card } from 'primereact/card';
 import axios from 'axios'
 import { useNavigate } from "react-router-dom";
-import { Button } from "primereact/button";
 import logo from "../pictures/logo.jpg"
 
 const SignUp = () => {
@@ -24,15 +23,12 @@ const SignUp = () => {
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
-                {/* <Card title="Task Track" subTitle="Sign Up" className="md:w-30rem custom-card p-card-subtitle"
-                        header={<img src="./pictures/logo.jpg" alt="logo" className="card-image" />}> */}
                 <Card className="md:w-30rem custom-card p-card-subtitle">
                     <div className="card-title">
                         <img src={logo} alt="logo" className="card-icon"/>
                         <h1>Task Track</h1>
                     </div>
                     <h2 style={{marginTop:"0px", marginBottom:"30px"}}>Sign Up</h2>
-                    {/*55555555555555555555555 */}
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
                             <div className="flex flex-wrap justify-content-center align-items-center gap-2">
@@ -64,8 +60,6 @@ const SignUp = () => {
                                 <InputText {...register("projectName")} className="input-focus" />
                             </div>
                             {errors.exampleRequired && <span>This field is required</span>}
-                            {/* <input type="submit" /> */}
-                            {/*submit buuton style */}
                             <input type="submit" value="Sign In" class="custom-button" />
                         </div>
                     </form>

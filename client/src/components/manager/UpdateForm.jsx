@@ -6,12 +6,13 @@ import { Avatar } from "primereact/avatar";
 import { Dropdown } from "primereact/dropdown";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function UpdateForm(props) {
     const navigate=useNavigate()
-    const id = props.id || {}
+    // const id = props.id || {}
+    const id=useSelector(x=>x.Id.id)
     const num = props.num || {}
-    // console.log(num);
     
     const rowData = props.rowData || {}
     const token = JSON.parse(localStorage.getItem('token')) || ""
@@ -33,7 +34,7 @@ export default function UpdateForm(props) {
         try{
             const res=await axios.put(`http://localhost:3005/api/user/updateUser`,client, { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                navigate(`../manager/${id}`, { state: {id,num:1} })
+                navigate(`../manager/${id}`, { state: {num:1} })
             }
         }catch(err){
             console.error(err)

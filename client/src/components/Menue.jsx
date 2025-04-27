@@ -1,11 +1,7 @@
 import { useEffect, useRef } from "react"
 import { useLocation } from "react-router-dom";
 import axios from 'axios'
-import ShowReceiverToOrganizer from './ShowReceiverToOrganizer'
 import React, { useState } from 'react';
-import { Dialog } from 'primereact/dialog';
-import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
 import { useForm } from 'react-hook-form';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
@@ -82,16 +78,12 @@ const Menue = () => {
         getMnager()
     }, [])
 
-    useEffect(() => {
-        console.log(projects)
-    }, [projects])
-
     return (
         <div className="menue">
             <Sidebar
-                visible={true} // תמיד פתוח
-                dismissable={false} // מונע סגירה בלחיצה חיצונית
-                modal={false} // לא יוצר שכבת רקע כהה
+                visible={true}
+                dismissable={false} 
+                modal={false}
                 className="w-64 h-screen fixed left-0 top-0 shadow-lg"
                 content={({ closeIconRef, hide }) => (
                     <div className="min-h-screen flex relative lg:static surface-ground">

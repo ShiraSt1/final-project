@@ -4,17 +4,10 @@ import SignUp from './components/SignUp';
 import {Routes, Route } from 'react-router-dom';
 import Site from './components/manager/Site';
 import SiteClient from './components/client/SiteClient';
+import SettingsClient from './components/client/Setting';
 function App() {
   return (
     <>
-      {/* <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/signUp" element={<SignUp />} />
-          <Route path="/manager/:id" element={<Manager/>} />
-          <Route path="/client/:id" element={<Client/>} />
-        </Routes> */}
-
-      {/* <Router> */}
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signUp" element={<SignUp />} />
@@ -25,13 +18,9 @@ function App() {
         <Route path="/manager/:id/settings" element={<Site />} />
 
         <Route path="/client/:id" element={<SiteClient />} />
+        <Route path="/client/:id/settings" element={<SettingsClient />} />
 
       </Routes>
-      {/* </Router> */}
-
-      {/* <div className="App">
-        <Login />
-      </div> */}
     </>
   );
 }

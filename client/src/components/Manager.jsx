@@ -87,18 +87,13 @@ useEffect(() => {
     getMnager()
 }, [])
 
-useEffect(() => {
-    console.log(projects)
-}, [projects])
-
-
 return (
     <>
         <div className="flex">
             <Sidebar
-                visible={true} // תמיד פתוח
-                dismissable={false} // מונע סגירה בלחיצה חיצונית
-                modal={false} // לא יוצר שכבת רקע כהה
+                visible={true}
+                dismissable={false} 
+                modal={false}
                 className="w-64 h-screen fixed left-0 top-0 shadow-lg"
                 content={({ closeIconRef, hide }) => (
                     <div className="min-h-screen flex relative lg:static surface-ground">
