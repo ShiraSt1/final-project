@@ -14,9 +14,11 @@ const Analitics = () => {
 
   const getWeekRange = (date) => {
     const startDate = new Date(date);
-    startDate.setDate(date.getDate() - date.getDay() - 1);
+    startDate.setDate(date.getDate() - date.getDay());
+    // startDate.setDate(date.getDate() - date.getDay() - 1);
     const endDate = new Date(date);
     endDate.setDate(date.getDate() + (6 - date.getDay()));
+    
     return { startDate, endDate };
   };
   const { startDate, endDate } = getWeekRange(new Date())
@@ -35,9 +37,9 @@ const Analitics = () => {
   }
 
   const makeAnalitics = (Mytasks) => {
-     setCompletedTasks ( Mytasks.filter(task => task.completed === true && new Date(task.date) > startDate && new Date(task.date) < endDate));
-     setMissedTasks (Mytasks.filter(task => task.completed === false && new Date(task.date) > startDate && new Date(task.date) < endDate));
-     setTasks (Mytasks.filter(task => new Date(task.date) > startDate && new Date(task.date) < endDate));
+    setCompletedTasks(Mytasks.filter(task => task.completed === true && new Date(task.date) > startDate && new Date(task.date) < endDate));
+    setMissedTasks(Mytasks.filter(task => task.completed === false && new Date(task.date) > startDate && new Date(task.date) < endDate));
+    setTasks(Mytasks.filter(task => new Date(task.date) > startDate && new Date(task.date) < endDate));
   }
 
   useEffect(() => {
@@ -47,8 +49,11 @@ const Analitics = () => {
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const barData = days.map((day, index) => ({
     name: day,
-    completed: completedTasks.filter(task => new Date(task.date).getDay() === index).length,
-    missed: missedTasks.filter(task => new Date(task.date).getDay() === index).length
+    completed: completedTasks.filter(task => {
+      // console.log("new Date(task.date).getDay(): ",new Date(task.date).getDay());
+      
+      return new Date(task.date).getDay() === (index)}).length,
+    missed: missedTasks.filter(task => new Date(task.date).getDay() === (index)).length
   }));
 
   const pieData = [
@@ -71,7 +76,13 @@ const Analitics = () => {
   const COLORS = ["#4ade80", "#f87171", "#60a5fa", "#facc15"];
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-6 max-w-5xl mx-auto"
+      style={{
+        margin: '5% ',
+        marginTop: '5%',
+        padding: '30px',
+      }}
+    >
       <h1 className="text-3xl font-bold text-center text-teal-700 mb-8">
         Task Statistics Overview For {startDate ? startDate.toLocaleDateString('he-IL') : ""}-{endDate ? endDate.toLocaleDateString('he-IL') : ""}
       </h1>

@@ -51,7 +51,7 @@ const Site = () => {
                     {num === 5 ? <DetailsCalander contacts={contacts} num={num} rowData={rowData} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
                     {num === 6 ? <Help/> : null}
                     {num === 7 ? <Analitics/> : null}
-                    {num !== 1 && num !==2  && num !== 4 && num !== 5 ? <p>num: {num}</p> : null}
+                    {num !== 1 && num !==2  && num !== 4 && num !== 5 && num !== 6 && num !== 7? <p>num: {num}</p> : null}
                 </>
             </div>
         </div>

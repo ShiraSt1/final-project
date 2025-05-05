@@ -74,7 +74,6 @@ export default function AddForm(props) {
                         placeholder="full name"
                         value={contact.name}
                         onChange={handleChange}
-                        required
                         className="input-focus"
                     />
                 </div>
@@ -101,7 +100,6 @@ export default function AddForm(props) {
                         placeholder="phone"
                         value={contact.phone}
                         onChange={handleChange}
-                        required
                         className="input-focus"
                     />
                 </div>

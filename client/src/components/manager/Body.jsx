@@ -79,10 +79,6 @@ export default function Body(props) {
             }
         };
 
-        const handleEdit = async () => {
-            navigate(`./editClient`, { state: { rowData, num: 3 } })
-        };
-
         const handleDetails = () => {
             navigate(`./Details/${rowData._id}`, { state: { rowData, num: 5 } })
         };
@@ -91,7 +87,6 @@ export default function Body(props) {
             <>
 
                 <Button icon="pi pi-trash" className="p-button-text" onClick={(e) => confirm(e)} />
-                <Button icon="pi pi-pencil" className="p-button-text" onClick={handleEdit} />
                 <Button label="Details" icon="pi pi-eye" className="p-button-text" onClick={handleDetails} />
             </>
         );
