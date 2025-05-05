@@ -5,7 +5,6 @@ const ProjectToManager = require("../models/ProjectToManager");
 const Task = require("../models/Task");
 const bcrypt = require('bcrypt');
 const { addProject } = require("./projectController");
-// const axios = require('axios');
 
 const addClient = async (req, res) => {
     const { name, userId, password, address, phone, email, managerId, projectId } = req.body
@@ -85,8 +84,7 @@ const getManagerClient = async (req, res) => {
     const clients = await Connection.find({ managerId: id }).populate("clientId").populate("projectId").lean()
     if (!clients)
         return res.status(400).send("clients not found")
-    const uniqueArray = [...new Set(clients)];
-    res.json(uniqueArray)
+    res.json(clients)
 }
 
 const getClientManagers = async (req,res)=>{
@@ -94,11 +92,10 @@ const getClientManagers = async (req,res)=>{
     if(!id){
         return re.status(400).send("id is required")
     }
-    const managers = await Connection.find({ clientId: id }).populate("managerId").lean()
+    const managers = await Connection.find({ clientId: id }).populate("managerId").populate("projectId").lean()
     if (!managers)
         return res.status(400).send("managers not found")
-    const uniqueArray = [...new Set(managers)];
-    res.json(uniqueArray)
+    res.json(managers)
 }
 
 const getUser = async (req, res) => {
@@ -241,8 +238,7 @@ const deleteClient = async (req, res) => {
     if (!clients) {
         return res.status(400).send("clients not found")
     }
-    const uniqueArray = [...new Set(clients)];
-    return res.json(uniqueArray)
+    return res.json(clients)
 }
 
 const addImage = async (req, res) => {

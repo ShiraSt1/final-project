@@ -10,7 +10,6 @@ import { useSelector } from "react-redux";
 export default function Header(props) {
   const navigate = useNavigate()
   const location = useLocation();
-  // const id = props.id || {}
   const id=useSelector(x=>x.Id.id)
   const manager = props.manager || {}
   const setManager = props.setManager || {}
@@ -89,13 +88,12 @@ export default function Header(props) {
 
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <span>{manager.name ? manager.name.split(' ').map(name => name.charAt(0).toUpperCase() + name.slice(1)).join(' ') : ""}</span>
-        <Button icon="pi pi-bell" className="p-button-rounded p-button-text p-button-secondary" />
-        <Button icon="pi pi-envelope" className="p-button-rounded p-button-text p-button-secondary" />
-        <Button icon="pi pi-user" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { num === 1 ? navigate(0, { state: {  num: 1 } }) : navigate(`/manager/${id}`, { state: {  num: 1 } }) }} />
+        <Button icon="pi pi-sign-out" className="p-button-rounded p-button-text p-button-secondary" onClick={()=>{localStorage.removeItem('token');navigate('/')}}/>
+        <Button icon="pi pi-users" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { num === 1 ? navigate(0, { state: {  num: 1 } }) : navigate(`/manager/${id}`, { state: {  num: 1 } }) }} />
         <Button icon="pi pi-cog" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { navigate(`/manager/${id}/settings`, { state: {  num: 4 } }) }} />
         <div>
           <Avatar
-            label={manager.imageURL ? "" : manager.name ? manager.name[0] : ""}
+            label={manager.imageUrl ? "" : manager.name ? manager.name[0] : ""}
             size="large"
             shape="circle"
             onClick={handleAvatarClick}

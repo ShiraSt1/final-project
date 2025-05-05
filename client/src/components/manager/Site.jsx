@@ -5,20 +5,25 @@ import SideBar from "./SideBar"
 import AddForm from "./AddForm"
 import UpdateForm from "./UpdateForm"
 import Settings from "./Setting"
+import Analitics from "./Analitics"
+import Help from "./Help"
 import { useEffect, useState } from "react";
 import DetailsCalander from "./DetailsCalander";
-import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
 const Site = () => {
     const location = useLocation();
-    // const id = location.state.id || {}
     const id=useSelector(x=>x.Id.id)
     const token = JSON.parse(localStorage.getItem('token')) || ""
-    const num = location.state.num || 0
-    const rowData = location.state.rowData || {}
+
+    let num=1;
+    let rowData={}
+    if(location.state){
+        num = location.state.num || 1
+        rowData= location.state.rowData || {}
+    }
+
     const [contacts, setContacts] = useState([]);
     const [manager,setManager]=useState({})
 
@@ -44,13 +49,15 @@ const Site = () => {
         <div>
             <SideBar contacts={contacts} setContacts={setContacts} num={num} manager={manager} setManager={setManager}/>
             <div className="content">
-                {num == 1 || num == 2 || num == 3 || num == 5 ? <Header num={num} contacts={contacts} setContacts={setContacts} manager={manager} setManager={setManager}/> :null}
+                <Header num={num} contacts={contacts} setContacts={setContacts} manager={manager} setManager={setManager}/>
                 <>
                     {num === 1 ? <Body contacts={contacts} num={num} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
                     {num === 2 ? <AddForm contacts={contacts} num={num} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
                     {num === 3 ? <UpdateForm  contacts={contacts} num={num} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
                     {num === 4 ? <Settings contacts={contacts} num={num} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
                     {num === 5 ? <DetailsCalander contacts={contacts} num={num} rowData={rowData} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
+                    {num === 6 ? <Help/> : null}
+                    {num === 7 ? <Analitics/> : null}
                     {num !== 1 && num !==2 && num !== 3 && num !== 4 && num !== 5 ? <p>num: {num}</p> : null}
                 </>
             </div>

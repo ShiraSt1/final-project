@@ -12,10 +12,10 @@ import { Calendar } from "primereact/calendar";
 import { FileUpload } from "primereact/fileupload";
 import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
 import { useSelector } from "react-redux";
+import { Tooltip } from 'primereact/tooltip';
 
 export default function SideBar(props) {
-  // const id = props.id || {}
-  const id=useSelector(x=>x.Id.id)
+  const id = useSelector(x => x.Id.id)
   const num = props.num || {}
   const setContacts = props.setContacts || {}
   const contacts = props.contacts || {}
@@ -31,8 +31,6 @@ export default function SideBar(props) {
   const [isProjectsOpen, setIsProjectsOpen] = useState(false);
   const [projects, setProjects] = useState([])
   const [projectName, setProjectName] = useState("")
-  const [professions, setProfessions] = useState([]);
-  const [selectedProfession, setSelectedProfession] = useState(null);
 
   const toggleProjects = () => {
     setIsProjectsOpen(!isProjectsOpen);
@@ -49,7 +47,7 @@ export default function SideBar(props) {
       if (res.status === 200) {
         const dataProject = res.data.map(project => { return project.projectId })
         setProjects(dataProject)
-        navigate(0, { state: {  num: 1 } })
+        navigate(0, { state: { num: 1 } })
       }
     } catch (err) {
       console.error(err)
@@ -57,8 +55,7 @@ export default function SideBar(props) {
   }
 
   const getProjects = async () => {
-    console.log(id);
-    
+
     try {
       const res = await axios.get(`http://localhost:3005/api/project/getProjects/${id}`,
         { headers: { Authorization: `Bearer ${token}` } })
@@ -75,7 +72,6 @@ export default function SideBar(props) {
 
   useEffect(() => {
     getProjects()
-    showAdd()
   }, [])
 
   // בדיקה האם מדובר במסך קטן
@@ -88,27 +84,6 @@ export default function SideBar(props) {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  //jobs api
-  const showAdd = async () => {
-    // setShow(true)
-    // console.log("inside");
-    // try {
-    //   // const res =await axios.get("https://gitlab.example.com/api/v4/projects/1/jobs", {
-    //   const res =await axios.get("https://data.gov.il/api/3/action/datastore_search", {
-    //     resource_id: "9f5a4b0d-7b28-4c6a-b13d-b35b1b0b3b1f",
-    //     params: { scope: ["pending", "running"] },
-    //     headers: { Authorization: `Bearer ${token}`}
-    //   })
-    //   if (res.status === 200) {
-    //     console.log("res === 200")
-    //     console.log(res.data)
-    //     setProfessions(res.data.map(job => ({ name: job.name, id: job.id })));
-    //   }
-    // } catch (err) {
-    //   console.error("Error:", err)
-    // }
-  }
 
   const showProjectContact = (projectId) => {
     setContacts(copyContacts.filter((contact) => {
@@ -137,8 +112,8 @@ export default function SideBar(props) {
     formData.append("projectId", taskToAlllClients.projectId);
     formData.append("file", taskToAlllClients.file);
     if (taskToAlllClients.description) {
-      formData.append("description",taskToAlllClients.description)
-  }
+      formData.append("description", taskToAlllClients.description)
+    }
     try {
       contacts.map(async (contact, index) => {
         if (contact.projectId === taskToAlllClients.projectId) {
@@ -184,13 +159,12 @@ export default function SideBar(props) {
   };
 
   const items = [
-    { label: "Dashboard", icon: "pi pi-home", command: () => console.log("Dashboard Clicked") },
     {
       label: "Users",
       icon: "pi pi-users",
       items: [
         { label: "All Clients", icon: "pi pi-list", command: () => { num === 1 ? navigate(0, { state: { num: 1 } }) : navigate(`/manager/${id}`, { state: { num: 1 } }) } },
-        { label: "Add Client", icon: "pi pi-user-plus", command: () => { num === 2 ? navigate(0, { state: {  num: 2 } }) : navigate(`/manager/${id}/AddClient`, { state: {  num: 2 } }) } }
+        { label: "Add Client", icon: "pi pi-user-plus", command: () => { num === 2 ? navigate(0, { state: { num: 2 } }) : navigate(`/manager/${id}/AddClient`, { state: { num: 2 } }) } }
       ]
     },
     {
@@ -204,6 +178,7 @@ export default function SideBar(props) {
         ...(isProjectsOpen ? projects.map(project => ({
           template: (item, options) => (
             <div
+              className="highlight-div"
               onClick={() => showProjectContact(project._id)}
               style={{
                 display: 'flex',
@@ -222,8 +197,10 @@ export default function SideBar(props) {
                   confirm(e, project._id);
                 }}
               />
+              <Tooltip target=".edit-icon" content="Add a task to all the group" />
               <i
-                className="pi pi-pen-to-square"
+                className="pi pi-pen-to-square edit-icon"
+                tooltipOptions={{ position: 'bottom', mouseTrack: true, mouseTrackTop: 15 }}
                 style={{ cursor: 'pointer', marginLeft: '5px' }}
                 onClick={() => { setTaskToAlllClients({ ...taskToAlllClients, projectId: project._id }); setShowAddTaskToAllClients(true) }}
               />
@@ -233,9 +210,9 @@ export default function SideBar(props) {
         { label: "Add Project", icon: "pi pi-plus", command: () => setShow(true) }
       ]
     },
-    { label: "Analytics", icon: "pi pi-chart-bar", command: () => console.log("Analytics Clicked") },
-    { label: "Settings", icon: "pi pi-cog", command: () => { navigate(`/manager/${id}/settings`, { state: { id, num: 4 } }) } },
-    { label: "Help", icon: "pi pi-question", command: () => console.log("Help Clicked") },
+    { label: "Analytics", icon: "pi pi-chart-bar", command: () => { navigate(`/manager/${id}/Analitics`, { state: { id, num: 7 } }) } },
+    { label: "Settings", icon: "pi pi-cog", command: () => { navigate(`/manager/${id}/Settings`, { state: { id, num: 4 } }) } },
+    { label: "Help", icon: "pi pi-question", command: () => { navigate(`/manager/${id}/Help`, { state: { id, num: 6 } }) }},
   ];
 
   return (
@@ -248,10 +225,10 @@ export default function SideBar(props) {
             <h2>Menu</h2>
             <Menu model={items} className="w-full" />
             {/* logo*/}
-            <div className="side-bar-title">
+            {/* <div className="side-bar-title">
               <img src={logo} alt="logo" className="card-icon-side" />
               <h1 style={{ fontSize: '50px', textAlign: 'center', margin: '0' }}>Task Track</h1>
-            </div>
+            </div> */}
             {/*logo */}
           </div>
         )}
@@ -270,10 +247,10 @@ export default function SideBar(props) {
           <h2>Menu</h2>
           <Menu model={items} className="w-full" />
           {/* logo*/}
-          <div className="side-bar-title">
+          {/* <div className="side-bar-title">
             <img src={logo} alt="logo" className="card-icon-side" />
             <h1 style={{ fontSize: '40px', textAlign: 'center', margin: '0' }}>Task Track</h1>
-          </div>
+          </div> */}
           {/*logo */}
         </Sidebar>
       </div>
@@ -285,6 +262,7 @@ export default function SideBar(props) {
         onHide={() => { if (!show) return; setShow(false); }}
         content={({ hide }) => (
           <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
+            <h2 style={{textAlign:'center'}}>Add a new project</h2>
             <div className="inline-flex flex-column gap-2">
               <InputText onChange={(e) => setProjectName(e.target.value)} className="input-focus" placeholder="Project Name" id="projectname" label="Projectname" type="text" ></InputText>
             </div>
@@ -304,6 +282,7 @@ export default function SideBar(props) {
         onHide={() => { if (!showAddTaskToAllClients) return; setShowAddTaskToAllClients(false); }}
         content={({ hide }) => (
           <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
+            <h2 style={{textAlign:'center'}}>Add a task to all the group</h2>
             <div className="inline-flex flex-column gap-2">
               <InputText onChange={(e) => setTaskToAlllClients({ ...taskToAlllClients, title: e.target.value })} className="input-focus" placeholder="Task Title" id="tasktitle" label="tasktitle" type="text" ></InputText>
             </div>
@@ -321,9 +300,9 @@ export default function SideBar(props) {
                   const newFile = e.files[0];
 
                   setTaskToAlllClients({
-                      ...taskToAlllClients, file:newFile
+                    ...taskToAlllClients, file: newFile
                   })
-              }}
+                }}
               />
             </div>
             <div className="flex align-items-center gap-2">
@@ -335,6 +314,7 @@ export default function SideBar(props) {
           </div>
         )}
       ></Dialog>
+
     </>
   );
 }

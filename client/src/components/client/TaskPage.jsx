@@ -13,8 +13,6 @@ import { Dropdown } from "primereact/dropdown";
 import { useSelector } from "react-redux";
 
 const TaskPage = (props) => {
-
-    // const id = props.id || {}
     const id=useSelector(x=>x.Id.id)
     const managers = props.managers || {}
     const tasks = props.tasks || {}
@@ -98,7 +96,8 @@ const TaskPage = (props) => {
                 setTasks(res.data.map(newTask => {
                     return {
                         ...newTask,
-                        managerName: newTask.connectionId.managerId.name
+                        managerName: newTask.connectionId.managerId.name,
+                        projectName: newTask.connectionId.projectId.name
                     }
                 }))
                 setTaskCompleted({})
@@ -159,6 +158,7 @@ const TaskPage = (props) => {
                             className="p-datatable-gridlines"
                         >
                             <Column field="managerName" header="Manager" style={{ minWidth: '120px' }} />
+                            <Column field="projectName" header="Project" style={{ minWidth: '120px' }} />
                             <Column field="title" header="Task" style={{ minWidth: '200px' }} />
                             <Column header="Description" body={(rowData) => rowData.description ? rowData.description : 'No description'} />
                             <Column
@@ -292,7 +292,7 @@ const TaskPage = (props) => {
                                 borderRadius: "5px",
                                 cursor: 'pointer'
                             }}>
-                                {`${manager.managerId.name}`}
+                                {`${manager.managerId.name}-${manager.projectId.name}`}
                             </div>
                         </div>
                     ))}
@@ -306,6 +306,7 @@ const TaskPage = (props) => {
                 onHide={() => { if (!showCompleted) return; setShowCompleted(false); }}
                 content={({ hide }) => (
                     <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
+                        <h2 style={{textAlign:'center'}}>Do you want to respond?</h2>
                         <div className="inline-flex flex-column gap-2">
                             <Dropdown
                                 value={taskCompleted.difficulty}
@@ -313,7 +314,7 @@ const TaskPage = (props) => {
                                 options={['easy', 'medium', 'hard']}
                                 placeholder="rating"
                                 style={{ textAlign: 'left' }}
-                                className="w-full md:w-14rem input-focus" />
+                                className="w-full input-focus" />
                         </div>
                         <div className="inline-flex flex-column gap-2">
                             <InputTextarea

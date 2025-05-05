@@ -15,7 +15,9 @@ function App() {
         <Route path="/manager/:id/AddClient" element={<Site />} />
         <Route path="/manager/:id/EditClient" element={<Site />} />
         <Route path="/manager/:id/Details/:id" element={<Site />} />
-        <Route path="/manager/:id/settings" element={<Site />} />
+        <Route path="/manager/:id/Settings" element={<Site />} />
+        <Route path="/manager/:id/Analitics" element={<Site />} />
+        <Route path="/manager/:id/Help" element={<Site />} />
 
         <Route path="/client/:id" element={<SiteClient />} />
         <Route path="/client/:id/settings" element={<SettingsClient />} />

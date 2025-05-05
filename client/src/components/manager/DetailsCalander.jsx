@@ -17,7 +17,6 @@ import DetailsTask from './DetailsTask';
 import { useSelector } from 'react-redux';
 
 const DetailsCalander = (props) => {
-    // const id = props.id || {}
     const id=useSelector(x=>x.Id.id)
     const manager = props.manager || {}
     const setManager = props.setManager || {}
@@ -334,7 +333,9 @@ const DetailsCalander = (props) => {
                             <tr>
                                 {daysOfWeek.map((day) => (
                                     <td key={day.getTime()} className="day-cell">
-                                        <Button label="Add Task" onClick={() => {
+                                        <Button label="Add Task" 
+                                        disabled={day.setHours(0,0,0,0) < new Date().setHours(0,0,0,0)}
+                                        onClick={() => {
                                             setShowAdd(true);
                                             ; setTask({ ...task, date: myFormat(day) })
                                         }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
@@ -354,6 +355,7 @@ const DetailsCalander = (props) => {
                 onHide={() => { if (!showAdd) return; setShowAdd(false); }}
                 content={({ hide }) => (
                     <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
+                        <h2 style={{textAlign:'center'}}>Add a new task</h2>
                         <div className="inline-flex flex-column gap-2">
                             <InputText onChange={(e) => setTask({ ...task, title: e.target.value })} className="input-focus" placeholder="Task Name" label="TaskName" type="text" required></InputText>
                         </div>
@@ -386,6 +388,7 @@ const DetailsCalander = (props) => {
                 onHide={() => { if (!showEdit) return; setShowEdit(false); }}
                 content={({ hide }) => (
                     <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
+                        <h2 style={{textAlign:'center'}}>Edit the task</h2>
                         <div className="inline-flex flex-column gap-2">
                             <InputText value={selectedTask.title} onChange={(e) => setSelectedTask({ ...selectedTask, title: e.target.value })} className="input-focus" placeholder="Task Name" label="TaskName" type="text" required></InputText>
                         </div>

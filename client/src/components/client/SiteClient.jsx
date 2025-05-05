@@ -7,7 +7,6 @@ import { useSelector } from "react-redux";
 
 const SiteClient = () => {
     const location = useLocation();
-    // const id = location.state || {}
     const id=useSelector(x=>x.Id.id)
     const [managers, setManagers] = useState([]);
     const [tasks, setTasks] = useState([]);
@@ -47,7 +46,8 @@ const SiteClient = () => {
                 setTasks(res.data.map(task => {
                     return {
                         ...task,
-                        managerName: task.connectionId.managerId.name
+                        managerName: task.connectionId.managerId.name,
+                        projectName: task.connectionId.projectId.name
                     }
                 }))
                 
@@ -65,9 +65,9 @@ const SiteClient = () => {
 
 
     return (
-        <div style={{ margin: "5%" }}>
-            <HeaderClient id={id} managers={managers} tasks={tasks} setTasks={setTasks} client={client} setClient={setClient} />
-            <TaskPage id={id} managers={managers} tasks={tasks} setTasks={setTasks} client={client} />
+        <div style={{ marginLeft: "5%",marginRight: "5%",marginButtom: "5%" }}>
+            <HeaderClient  managers={managers} tasks={tasks} setTasks={setTasks} client={client} setClient={setClient} />
+            <TaskPage managers={managers} tasks={tasks} setTasks={setTasks} client={client} />
         </div>
     )
 }

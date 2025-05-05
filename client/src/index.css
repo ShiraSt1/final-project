@@ -163,13 +163,20 @@ th {
   font-size: 1.8rem; 
 }
 
+.highlight-div {
+  transition: all 0.3s ease;  
+}
+
+.highlight-div:hover {
+  background-color:var(--surface-200);
+}
 
 /*5555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555*/
 
 
 /*sighn in-submit*/
 .custom-button {
-  background-color: #4CAF50; /* ירוק חי */
+  background-color: #4CAF50; 
   border: none;
   color: white;
   padding: 12px 24px;
@@ -234,8 +241,8 @@ th {
 
 /*settings-tab-color*/
 .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
-  color: green !important; /* צבע טקסט */
-  border-bottom: 3px solid #888 !important;/* צבע קו תחתון*/
+  color: green !important; 
+  border-bottom: 3px solid #888 !important;
 }
 /*settings-tab-color*/
 

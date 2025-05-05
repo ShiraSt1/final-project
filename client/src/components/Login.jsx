@@ -23,7 +23,6 @@ const Login = () => {
                 localStorage.setItem("token", JSON.stringify(res.data.accessToken))
                 dispatch({type:"fill",payload:res.data.id})
                 valueRole === "manager" ? navigate(`./manager/${res.data.id}`, { state: {  num: 1 } }) : navigate(`./client/${res.data.id}`)
-                // valueRole === "manager" ? navigate(`./manager/${res.data.id}`, { state: { id: res.data.id, num: 1 } }) : navigate(`./client/${res.data.id}`, { state: res.data.id })
             }
         } catch (err) {
             alert("Invalid User or Password")
