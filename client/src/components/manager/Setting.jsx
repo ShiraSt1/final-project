@@ -23,7 +23,6 @@ export default function Settings(props) {
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
                 setManager(res.data)
-                // alert("updated")
                 toast.current.show({ severity: 'success', summary: 'Updated', detail:` Manager details updated`, life: 3000 });
             }
         }
@@ -38,7 +37,6 @@ export default function Settings(props) {
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
                 setManager(res.data)
-                // alert("updated")
                 toast.current.show({ severity: 'success', summary: 'Updated', detail:` Manager password updated`, life: 3000 });
             }
         }

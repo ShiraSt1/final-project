@@ -13,6 +13,9 @@ import { FileUpload } from "primereact/fileupload";
 import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
 import { useSelector } from "react-redux";
 import { Tooltip } from 'primereact/tooltip';
+import { useRef } from 'react';
+import { Toast } from 'primereact/toast';
+import { InputTextarea } from "primereact/inputtextarea";
 
 export default function SideBar(props) {
   const id = useSelector(x => x.Id.id)
@@ -31,6 +34,7 @@ export default function SideBar(props) {
   const [isProjectsOpen, setIsProjectsOpen] = useState(false);
   const [projects, setProjects] = useState([])
   const [projectName, setProjectName] = useState("")
+  const toast = useRef(null);
 
   const toggleProjects = () => {
     setIsProjectsOpen(!isProjectsOpen);
@@ -131,7 +135,7 @@ export default function SideBar(props) {
                 date: "",
                 file: {}
               })
-              alert("task added to all clients")
+              toast.current.show({severity:'success', summary: 'Success', detail:'Task Aadded to all the clients in the group', life: 3000});
             }
           }
         }
@@ -219,6 +223,7 @@ export default function SideBar(props) {
     <>
 
       <div className="app-container">
+      <Toast ref={toast} />
         {/* Sidebar קבוע במסכים גדולים */}
         {!isMobile && (
           <div className="sidebar">
@@ -267,9 +272,14 @@ export default function SideBar(props) {
               <InputText onChange={(e) => setProjectName(e.target.value)} className="input-focus" placeholder="Project Name" id="projectname" label="Projectname" type="text" ></InputText>
             </div>
             <div className="flex align-items-center gap-2">
+              {projectName?
               <Button label="Add" onClick={(e) => {
                 hide(e); addProject()
+              }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>:
+              <Button disabled label="Add" onClick={(e) => {
+                hide(e); addProject()
               }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>
+            }
               <Button label="Cancel" onClick={(e) => hide(e)} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>
             </div>
           </div>
@@ -287,7 +297,7 @@ export default function SideBar(props) {
               <InputText onChange={(e) => setTaskToAlllClients({ ...taskToAlllClients, title: e.target.value })} className="input-focus" placeholder="Task Title" id="tasktitle" label="tasktitle" type="text" ></InputText>
             </div>
             <div className="inline-flex flex-column gap-2">
-              <InputText onChange={(e) => setTaskToAlllClients({ ...taskToAlllClients, description: e.target.value })} className="input-focus" placeholder="Description" id="Description" label="Projectname" type="text" ></InputText>
+              <InputTextarea onChange={(e) => setTaskToAlllClients({ ...taskToAlllClients, description: e.target.value })} className="input-focus" placeholder="Description" id="Description" label="Projectname" type="text" ></InputTextarea>
             </div>
             <div className="inline-flex flex-column gap-2">
               <Calendar placeholder="Date" value={taskToAlllClients.date} onChange={(e) => setTaskToAlllClients({ ...taskToAlllClients, date: e.target.value })} />
@@ -306,10 +316,22 @@ export default function SideBar(props) {
               />
             </div>
             <div className="flex align-items-center gap-2">
+              {(taskToAlllClients.title && taskToAlllClients.date) ?
               <Button label="Add" onClick={(e) => {
                 hide(e); addTaskToAllClients()
+              }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>:
+              <Button disabled label="Add" onClick={(e) => {
+                hide(e); addTaskToAllClients()
               }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>
-              <Button label="Cancel" onClick={(e) => hide(e)} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>
+              }
+              <Button label="Cancel" onClick={(e) => {hide(e);setTaskToAlllClients({
+                managerId: id,
+                projectId: "",
+                title: "",
+                description: "",
+                date: "",
+                file: {}
+              })}} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>
             </div>
           </div>
         )}

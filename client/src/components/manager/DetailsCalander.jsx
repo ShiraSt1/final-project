@@ -118,14 +118,13 @@ const DetailsCalander = (props) => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
     /*end chat  */
-    const getTasks = async () => {
 
+    const getTasks = async () => {
         try {
             const res = await axios.get(`http://localhost:3005/api/task/getTasksClient/${id}/${rowData.projectId}/${rowData._id}`,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                const tasksData = res.data.map((task) => { return task })
-                setTasks(tasksData)
+                setTasks(res.data)
             }
         }
         catch (err) {
@@ -375,8 +374,21 @@ const DetailsCalander = (props) => {
                                 }} />
                         </div>
                         <div className="flex align-items-center gap-2">
+                            {task.title?
                             <Button label="Add" onClick={(e) => { hide(e); addTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
-                            <Button label="Cancel" onClick={(e) => hide(e)} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
+                        :
+                            <Button disabled label="Add" onClick={(e) => { hide(e); addTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+                        }
+                            <Button label="Cancel" onClick={(e) => {hide(e);setTask({
+                    title: "",
+                    description: "",
+                    managerId: id,
+                    projectId: rowData.projectId,
+                    clientId: rowData._id,
+                    date: null,
+                    _id: null,
+                    file: null
+                })}} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
                         </div>
                     </div>
                 )}
@@ -438,7 +450,10 @@ const DetailsCalander = (props) => {
                             />
                         </div>
                         <div className="flex align-items-center gap-2">
+                            {selectedTask.title ?
                             <Button label="Update" onClick={(e) => { hide(e); editTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+                            :<Button disabled label="Update" onClick={(e) => { hide(e); editTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+                            }
                             <Button label="Cancel" onClick={(e) => hide(e)} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
                         </div>
                     </div>

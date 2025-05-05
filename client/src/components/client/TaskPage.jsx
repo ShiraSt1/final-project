@@ -328,9 +328,13 @@ const TaskPage = (props) => {
                             />
                         </div>
                         <div className="flex align-items-center gap-2">
+                            {(taskCompleted.comment || taskCompleted.difficulty)? 
                             <Button label="Send" onClick={(e) => {
                                 hide(e); updateTask()
-                            }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>
+                            }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>:
+                            <Button disabled label="Send" onClick={(e) => {
+                                hide(e); updateTask()
+                            }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>}
                             <Button label="No" onClick={(e) => { hide(e); updateTask() }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>
                         </div>
                     </div>

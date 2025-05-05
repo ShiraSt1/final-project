@@ -3,7 +3,6 @@ import Body from "./Body"
 import Header from "./Header"
 import SideBar from "./SideBar"
 import AddForm from "./AddForm"
-import UpdateForm from "./UpdateForm"
 import Settings from "./Setting"
 import Analitics from "./Analitics"
 import Help from "./Help"
@@ -16,13 +15,8 @@ const Site = () => {
     const location = useLocation();
     const id=useSelector(x=>x.Id.id)
     const token = JSON.parse(localStorage.getItem('token')) || ""
-
-    let num=1;
-    let rowData={}
-    if(location.state){
-        num = location.state.num || 1
-        rowData= location.state.rowData || {}
-    }
+    const num = location.state.num || 1
+    const rowData= location.state.rowData || {}
 
     const [contacts, setContacts] = useState([]);
     const [manager,setManager]=useState({})
@@ -53,12 +47,11 @@ const Site = () => {
                 <>
                     {num === 1 ? <Body contacts={contacts} num={num} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
                     {num === 2 ? <AddForm contacts={contacts} num={num} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
-                    {num === 3 ? <UpdateForm  contacts={contacts} num={num} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
                     {num === 4 ? <Settings contacts={contacts} num={num} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
                     {num === 5 ? <DetailsCalander contacts={contacts} num={num} rowData={rowData} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
                     {num === 6 ? <Help/> : null}
                     {num === 7 ? <Analitics/> : null}
-                    {num !== 1 && num !==2 && num !== 3 && num !== 4 && num !== 5 ? <p>num: {num}</p> : null}
+                    {num !== 1 && num !==2  && num !== 4 && num !== 5 ? <p>num: {num}</p> : null}
                 </>
             </div>
         </div>

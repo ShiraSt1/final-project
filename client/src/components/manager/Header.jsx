@@ -80,12 +80,9 @@ export default function Header(props) {
           <span className="p-inputgroup-addon">
             <i className="pi pi-search" />
           </span>
-          {/*ruth----- add className="input-focus" to all inputtext --------------------*/}
           <InputText type="text" className="p-inputtext-lg input-focus" placeholder="Search..." onChange={(e) => { searchName(e.target.value) }} /></> : null
         }
-
       </div>
-
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <span>{manager.name ? manager.name.split(' ').map(name => name.charAt(0).toUpperCase() + name.slice(1)).join(' ') : ""}</span>
         <Button icon="pi pi-sign-out" className="p-button-rounded p-button-text p-button-secondary" onClick={()=>{localStorage.removeItem('token');navigate('/')}}/>
