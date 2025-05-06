@@ -138,7 +138,6 @@ const updateTask = async (req, res) => {
         return res.status(400).send("task not found")
     }
 
-    /*delete old file*/
     let fileExist = null
     let fileData = null
 
@@ -149,6 +148,7 @@ const updateTask = async (req, res) => {
             fileSize: file.size,
             fileType: file.mimetype
         };
+    /*delete old file*/
         const tasks = await Task.find({ file: task.file }).lean()
         if (!tasks) {
             return res.status(400).send("tasks not found")
@@ -166,6 +166,7 @@ const updateTask = async (req, res) => {
                 return res.status(400).send("file not deleted")
             }
         }
+    /*delete old file*/
 
         if (!file.originalname || !file.path || !file.size || !file.mimetype) {
             return res.status(400).send("fileName and filePath and fileSize and fileType are required")
@@ -179,7 +180,6 @@ const updateTask = async (req, res) => {
             }
         }
     }
-    /*delete old file*/
 
     task.title = title
     task.description = description
@@ -249,19 +249,17 @@ const deleteTask = async (req, res) => {
     if (!task) {
         return res.status(400).send("task not found")
     }
-
     if (task.file) {
-        const tasks = await Task.find({ file: task.file._id }).lean
+        const tasks = await Task.find({ file: task.file._id }).lean()
         if (!tasks) {
             return res.status(400).send("tasks not found")
         }
-
         if (tasks.length === 1) {
+            
             const file = await File.findById(task.file._id).exec();
             if (!file) {
                 return res.status(400).send("file not found")
             }
-
             const result = await file.deleteOne()
             if (!result) {
                 return res.status(400).send("file not deleted")
