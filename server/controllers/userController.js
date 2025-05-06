@@ -11,6 +11,7 @@ const addClient = async (req, res) => {
     if (!name || !userId || !password || !phone || !managerId || !projectId) {
         return res.status(400).send("name and userId and managerId and projectId and password and phone and role are required")
     }
+
     const projectToManager = await ProjectToManager.findOne({ managerId, projectId }).lean()
     if (!projectToManager) {
         return res.status(400).send("project not found")
@@ -19,6 +20,10 @@ const addClient = async (req, res) => {
 
     if (user) {
 
+        const userExist = await Connection.findOne({ clientId: user._id, managerId, projectId }).lean()
+        if (userExist) {
+            return res.status(400).send("client exists")
+        }
         const client = await Connection.create({ projectId, managerId, clientId: user._id })
 
         if (!client) {
@@ -78,7 +83,7 @@ const addManager = async (req, res) => {
 
 const getManagerClient = async (req, res) => {
     const { id } = req.params
-    if(!id){
+    if (!id) {
         return re.status(400).send("id is required")
     }
     const clients = await Connection.find({ managerId: id }).populate("clientId").populate("projectId").lean()
@@ -87,9 +92,9 @@ const getManagerClient = async (req, res) => {
     res.json(clients)
 }
 
-const getClientManagers = async (req,res)=>{
+const getClientManagers = async (req, res) => {
     const { id } = req.params
-    if(!id){
+    if (!id) {
         return re.status(400).send("id is required")
     }
     const managers = await Connection.find({ clientId: id }).populate("managerId").populate("projectId").lean()

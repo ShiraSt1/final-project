@@ -126,6 +126,7 @@ export default function SideBar(props) {
           const res = await axios.post(`http://localhost:3005/api/task/addTask`, formData,
             { headers: { Authorization: `Bearer ${token}` } })
           if (res.status === 200) {
+
             if (index === contacts.length - 1) {
               setTaskToAlllClients({
                 managerId: id,

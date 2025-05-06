@@ -13,7 +13,7 @@ import { Dropdown } from "primereact/dropdown";
 import { useSelector } from "react-redux";
 
 const TaskPage = (props) => {
-    const id=useSelector(x=>x.Id.id)
+    const id = useSelector(x => x.Id.id)
     const managers = props.managers || {}
     const tasks = props.tasks || {}
     const setTasks = props.setTasks || {}
@@ -168,28 +168,32 @@ const TaskPage = (props) => {
                                         <i className="pi pi-file" style={{ fontSize: '2rem', color: '#6c757d' }}></i>
                                         <div className="flex-1">
                                             <h4 className="m-0">{rowData.file?.fileName}</h4>
-                                            <a href={`http://localhost:3005/${rowData.file?.filePath}`} download>
-                                                <Button icon="pi pi-download" className="p-button-sm p-button-text" />
-                                            </a>
+                                            {/*ruth------------------------------------------------------------------------*/}
                                             <Button
-                                                icon="pi pi-external-link"
-                                                className="p-button-sm p-button-text"
-                                                onClick={() => window.open(`http://localhost:3005/${rowData.file?.filePath}`, '_blank')}
-
+                                                icon="pi pi-download"
+                                                text
+                                                onClick={() => { window.open(`http://localhost:3005/api/file/download/${rowData.file?.fileName}`, '_blank') }}
                                             />
                                             <Button
+                                                icon="pi pi-external-link"
+                                                text
+                                                onClick={() => window.open(`http://localhost:3005/api/file/files/${rowData.file?.fileName}`, '_blank')}
+                                            />
+                                            {/* <Button
                                                 icon="pi pi-print"
                                                 className="p-button-sm p-button-text"
                                                 onClick={() => {
-                                                    const printWindow = window.open(`http://localhost:3005/${rowData.file?.filePath}`, '_blank');
-                                                    if (printWindow) {
-                                                        printWindow.focus();
-                                                        printWindow.onload = () => {
-                                                            printWindow.print();
-                                                        };
-                                                    }
+                                                    // const printWindow = window.open(`http://localhost:3005/api/file/files/${rowData.file?.fileName}`, '_blank');
+                                                    // if (printWindow) {
+                                                    //     printWindow.focus();
+                                                    //     printWindow.onload = () => {
+                                                    //         printWindow.print();
+                                                    //     };
+                                                    // }
+                                                    
                                                 }}
-                                            />
+                                            /> */}
+                                            {/*ruth-----------------------------------------------------------------------------*/}
                                         </div>
                                     </div>
                                 ) : <>No File</>
@@ -251,7 +255,7 @@ const TaskPage = (props) => {
                             <div style={{
                                 padding: "5%",
                                 backgroundColor: msg.sender === client.name ? '#dcdcdc' : '#f5f5f5',
-                                borderRadius: "5px" 
+                                borderRadius: "5px"
                             }}>
                                 {`${msg.sender}: ${msg.content}`}
                             </div>
@@ -306,7 +310,7 @@ const TaskPage = (props) => {
                 onHide={() => { if (!showCompleted) return; setShowCompleted(false); }}
                 content={({ hide }) => (
                     <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
-                        <h2 style={{textAlign:'center'}}>Do you want to respond?</h2>
+                        <h2 style={{ textAlign: 'center' }}>Do you want to respond?</h2>
                         <div className="inline-flex flex-column gap-2">
                             <Dropdown
                                 value={taskCompleted.difficulty}
@@ -328,13 +332,13 @@ const TaskPage = (props) => {
                             />
                         </div>
                         <div className="flex align-items-center gap-2">
-                            {(taskCompleted.comment || taskCompleted.difficulty)? 
-                            <Button label="Send" onClick={(e) => {
-                                hide(e); updateTask()
-                            }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>:
-                            <Button disabled label="Send" onClick={(e) => {
-                                hide(e); updateTask()
-                            }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>}
+                            {(taskCompleted.comment || taskCompleted.difficulty) ?
+                                <Button label="Send" onClick={(e) => {
+                                    hide(e); updateTask()
+                                }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button> :
+                                <Button disabled label="Send" onClick={(e) => {
+                                    hide(e); updateTask()
+                                }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>}
                             <Button label="No" onClick={(e) => { hide(e); updateTask() }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>
                         </div>
                     </div>

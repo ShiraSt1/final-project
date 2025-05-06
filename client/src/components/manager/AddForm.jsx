@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Avatar } from "primereact/avatar";
@@ -8,6 +8,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
+import { Toast } from 'primereact/toast'
+import { ProgressSpinner } from "primereact/progressspinner";
 
 export default function AddForm(props) {
     const navigate=useNavigate()
@@ -15,6 +17,8 @@ export default function AddForm(props) {
     const id=useSelector(x=>x.Id.id)
     const [selectedProject, setSelectedProject] = useState(null);
     const [projects, setProjects] = useState([]);
+      const toast=useRef(null)
+    
     const { register, handleSubmit, watch, formState: { errors } } = useForm();
     const [contact, setContact] = useState({
         name: "",
@@ -47,12 +51,39 @@ export default function AddForm(props) {
         try{
             const res=await axios.post(`http://localhost:3005/api/user/addClient`,client, { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                navigate(`../manager/${id}`, { state:{num:1} })
+                senEmail(e,contact.name,contact.email)
+                setContact({})
             }
         }catch(err){
             console.error(err)
+            toast.current.show({severity:'error', summary: 'Error', detail:err.response.data, life: 3000});
         }
     };
+
+    /*5*/
+    const [loading, setLoading] = useState(false);
+  
+    const senEmail = async (e,name,email) => {
+      setLoading(true)
+      e.preventDefault();
+      try {
+        const res = await axios.post('http://localhost:3005/api/email/send-email-to-client', {
+          name,
+          email,
+          manager:props.manager.name
+        });
+        if (res.status === 200) {
+        //   toast.current.show({ severity: 'success', summary: 'Success', detail: 'User added successfuly. \n An email was sent to him.', life: 3000 });
+            navigate(`../manager/${id}`, { state:{num:1} })    
+    }
+      } catch (err) {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: err.response?.data?.error || err.message, life: 3000 });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+/*5*/
 
     useEffect(() => {
         getProjects()
@@ -60,9 +91,16 @@ export default function AddForm(props) {
     
     return (
         <div className="form-container">
+                  <Toast ref={toast} />
+            
             <form onSubmit={onSubmit} className="form-content">
                 <div className="profile-section">
                     <Avatar icon="pi pi-user" size="xlarge" shape="circle" className="profile-avatar" />
+                    {loading && (
+                                <div style={{ margin: "20px" }}>
+                                  <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="5" />
+                                </div>
+                              )}
                 </div>
                 <div className="p-inputgroup">
                     <span className="p-inputgroup-addon">
@@ -146,6 +184,7 @@ export default function AddForm(props) {
                         required
                         className="w-full md:w-14rem input-focus" />
                 </div>
+                <small className="text-left">*After saving the user, an email will be sent to them with the details.</small>
                 <Button type="submit" label="save" className="p-button-outlined save-btn" />
             </form>
         </div>

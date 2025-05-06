@@ -6,6 +6,7 @@ const connectDB = require("./config/dbConn");
 connectDB();
 const app = express();
 const path = require("path");
+
 /* socket */
 const http = require('http');
 const socketIo = require('socket.io');
@@ -27,7 +28,8 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 // אפשרות לשמירת קבצים גדולים יותר
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -36,6 +38,10 @@ app.use("/api/task", require("./routes/task"));
 app.use("/api/login", require("./routes/login"));
 app.use("/api/project", require("./routes/project"));
 app.use("/api/email", require("./routes/emailRoutes"));
+/*ruth----------------------------------------------------------------------*/
+app.use("/api/file", require("./routes/file"));
+/*ruth----------------------------------------------------------------------*/
+
 
 mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB');
@@ -60,7 +66,7 @@ io.on('connection', (socket) => {
 
     // קבלה ושליחה של הודעות
     socket.on('sendMessage', (message) => {
-        
+
         messages.push(message);
         io.emit('newMessage', message); // שידור ההודעה לכל המחוברים
     });

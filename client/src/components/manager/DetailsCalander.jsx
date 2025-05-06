@@ -190,11 +190,16 @@ const DetailsCalander = (props) => {
         if (task.description) {
             formData.append("description",task.description)
         }
+
         try {
-            const res = await axios.post(`http://localhost:3005/api/task/addTask`, formData,
+            /*ruth*/
+            const res = await axios.post(`http://localhost:3005/api/file/addTask`, formData,
+            /*ruth*/
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
                 setTasks(res.data)
+                // console.log("date of new task: ",new Date(task.date).getDay());
+                
                 setTask({
                     title: "",
                     description: "",

@@ -6,7 +6,7 @@ const upload = require('../middleware/upload');
 const manager = require("../middleware/managerMiddleware")
 const client = require("../middleware/clientMiddleware")
 
-router.post("/addTask",userJWT, manager,upload.single('file') ,taskController.addTask)
+// router.post("/addTask",userJWT, manager,upload.single('file') ,taskController.addTask)
 // router.get("/getTask/:id",userJWT,taskController.getTask)
 router.get("/getTasksClient/:managerId/:projectId/:clientId",userJWT,manager,taskController.getTasksClient)
 router.get("/getAllManagerTasks/:managerId",userJWT,manager,taskController.getAllManagerTasks)

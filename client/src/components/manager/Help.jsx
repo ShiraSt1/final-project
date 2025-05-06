@@ -8,10 +8,9 @@ const Help = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const toast = useRef(null);
-  /*5*/
+  const toast=useRef(null)
   const [loading, setLoading] = useState(false);
-  /*5*/
+
   const onSubmit = async (e) => {
     setLoading(true)
     e.preventDefault();

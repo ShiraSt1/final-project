@@ -38,16 +38,18 @@ const DetailsTask = (props) => {
                                     {(task.file.fileSize / 1024).toFixed(1)} KB
                                 </p>
                             </div>
-                            <a href={task.file.filePath} download>
-                             
-                                <Button icon="pi pi-download" text tooltip="download file" />
-                            </a>
+                            {/*ruth-----------------------------------------------------------------*/}
+                            <Button
+                                icon="pi pi-download"
+                                text
+                                onClick={() => {window.open(`http://localhost:3005/api/file/download/${task.file.fileName}`, '_blank')}}
+                            />
                             <Button
                                 icon="pi pi-eye"
                                 text
-                                tooltip="watch"
-                                onClick={() => window.open(`http://localhost:3005/${task.file.filePath}`, '_blank')}
+                                onClick={() => window.open(`http://localhost:3005/api/file/files/${task.file.fileName}`, '_blank')}
                             />
+                            {/*ruth-----------------------------------------------------------------*/}
                         </div>
                     </>
                 )}
